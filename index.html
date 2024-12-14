@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+    <title>Logistik-Zielkonflikt-Spiel</title>
+    <style>
+        body {
+            font-family: 'Press Start 2P', cursive;
+            text-align: center;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin: 20px auto;
+            width: 90%;
+            max-width: 800px;
+        }
+        #warehouse {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            border: 2px solid #333;
+            background-color: #000;
+            background-image: url('background.png');
+            background-size: cover;
+        }
+        .controls input[type="range"] {
+            width: 300px;
+        }
+        .stats {
+            margin: auto;
+            border-radius: 10px;
+            width: 400px;
+            height: 400px;
+            padding: 20px;
+        }
+        .screen {
+            background: url('retro_computer.png') no-repeat center center;
+            background-size: cover;            
+            width: 400px;
+            height: 400px;
+            padding: 90px;
+        }
+        .stats div {
+            margin: 5px;
+            font-size: 13px;
+            border-radius: 5px;
+            text-align: left;;
+            padding: 6px;
+        }
+        #game-over {
+            display: none;
+            font-size: 24px;
+            color: red;
+            margin-top: 20px;
+        }
+        #times-up {
+            display: none;
+            font-size: 24px;
+            color: #00ffa2;
+            margin-top: 20px;
+        }
+        #timer {
+            font-size: 24px;
+            color: #00ffa2;
+            margin: 10px;
+        }
+
+        .button {
+            font-size: 18px;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #444;
+            color: #00ffa2;
+            border: 2px solid #00ffa2;
+            border-radius: 5px;
+            text-transform: uppercase;
+            box-shadow: 0 0 10px #00ffa2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Zielkonflikt-Spiel</h1>
+        <p>Dein Ziel ist es, in 40 Sekunden möglichst viel mit deinen Paketen zu verdienen. </p>
+            <p>Beachte aber, dass die Nachfrage schwankt.</p>
+            <p>Das Spiel ist vorbei, wenn du nicht liefern kannst, dein Lager voll ist oder du nicht liefern kannst.</p>
+        
+        <canvas id="warehouse" width="600" height="600"></canvas>
+        <div id="game-over">Spiel vorbei!</div>
+        <div id="times-up">Die Zeit ist abgelaufen. <br>Du hast <span id="final-balance"></span> € verdient.</div>
+
+
+        <div class="stats screen">
+            <div class="controls">
+                <label for="orderAmount">Bestellmenge: <span id="orderValue">10</span></label><br>
+                <input type="range" id="orderAmount" min="1" max="50" value="10">
+            </div>
+            <div>Lagerbestand: <span id="stock" style="float: right;">50</span> Einheiten</div>
+            <div>Konto: <span id="balance" style="float: right;">1000</span> €</div>
+            <div>Lieferkosten: <span id="deliveryCost" style="float: right;">0</span> €</div>
+            <div>Lagerkosten: <span id="storageCost" style="float: right;">0</span> €</div>
+            <div>Einnahmen pro Runde: <span id="income" style="float: right;">0</span> €</div>
+            <div id="timer">Zeit: <span id="timeLeft" style="float: right;">40</span> Sek</div>
+            <button id="start-button" class="button">Start</button>
+            <button id="restart-button" class="button" style="display: none;">Neu starten</button>
+    
+        </div>
+        
+    </div>
+
+
+    <script>
+        const canvas = document.getElementById("warehouse");
+        const ctx = canvas.getContext("2d");
+        const orderAmountInput = document.getElementById("orderAmount");
+        const orderValueDisplay = document.getElementById("orderValue");
+        const balanceDisplay = document.getElementById("balance");
+        const stockDisplay = document.getElementById("stock");
+        const deliveryCostDisplay = document.getElementById("deliveryCost");
+        const storageCostDisplay = document.getElementById("storageCost");
+        const incomeDisplay = document.getElementById("income");
+        const gameOverDisplay = document.getElementById("game-over");
+        const finalBalanceDisplay = document.getElementById("times-up");
+        const timeLeftDisplay = document.getElementById("timeLeft");
+        const startButton = document.getElementById("start-button");
+        const restartButton = document.getElementById("restart-button");
+        
+        let balance, stock, orderAmount, timeLeft, gameInterval, timerInterval;
+        const background = new Image();
+        background.src = 'background.png';
+        const packageImage = new Image();
+        packageImage.src = 'paket.png';
+
+        const MAX_STOCK = 100; // Maximale Lagerkapazität
+        const MIN_STOCK = 1; // Minimale Lagerkapazität
+
+        function initializeGame() {
+            balance = 1000;
+            stock = 50;
+            orderAmount = 10;
+            timeLeft = 40;
+            gameOverDisplay.style.display = "none";
+            finalBalanceDisplay.style.display = "none";
+            restartButton.style.display = "none";
+            startButton.style.display = "none";
+            updateDisplay();
+            drawWarehouse();
+            gameInterval = setInterval(nextRound, 500);
+            startTimer();
+        }
+        
+        function drawWarehouse() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#000";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+            
+            const offsetX = 50;
+            const offsetY = 120;
+            const boxSize = 40;
+            const boxSpacingX = 50;
+            const boxSpacingY = 40;
+            for (let i = 0; i < stock; i++) {
+                let col = i % 10;
+                let row = Math.floor(i / 10);
+                if ((col === 5 || col === 6) && row >= 6 && row <= 10) {
+                    continue;
+                }
+                ctx.drawImage(packageImage, offsetX + col * boxSpacingX, offsetY + row * boxSpacingY, boxSize, boxSize);
+            }
+        }
+        
+        function updateDisplay() {
+            balanceDisplay.textContent = balance;
+            stockDisplay.textContent = stock;
+            orderValueDisplay.textContent = orderAmount;
+            timeLeftDisplay.textContent = timeLeft;
+        }
+        
+        function nextRound() {
+            if (balance <= 0 || stock >= MAX_STOCK || stock <= MIN_STOCK) {
+                gameOverDisplay.style.display = "block";
+                clearInterval(gameInterval);
+                clearInterval(timerInterval);
+                restartButton.style.display = "inline-block";
+                return;
+            } 
+            if (timeLeft <= 0) {
+                finalBalanceDisplay.style.display = "block";
+                earnings = balance - 1000;
+                finalBalanceDisplay.textContent = "Du hast " + earnings + " € verdient.";
+                clearInterval(gameInterval);
+                clearInterval(timerInterval);
+                restartButton.style.display = "inline-block";
+                return;
+            }
+            
+            let consumption = Math.floor(Math.random() * 16) + 5;
+            let actualConsumption = Math.min(consumption, stock);
+            stock -= actualConsumption;
+            let deliveryCost = orderAmount >= 30 ? orderAmount * 1 : orderAmount * 2;
+            let storageCost = stock * 1;
+            let income = actualConsumption * 5;
+            
+            balance += income - deliveryCost - storageCost;
+            stock += orderAmount;
+            
+            deliveryCostDisplay.textContent = deliveryCost;
+            storageCostDisplay.textContent = storageCost;
+            incomeDisplay.textContent = income;
+            
+            updateDisplay();
+            drawWarehouse();
+        }
+        
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    updateDisplay();
+                } else {
+                    gameOverDisplay.style.display = "block";
+                    clearInterval(gameInterval);
+                    clearInterval(timerInterval);
+                    restartButton.style.display = "inline-block";
+                }
+            }, 1000);
+        }
+        
+        orderAmountInput.addEventListener("input", () => {
+            orderAmount = parseInt(orderAmountInput.value);
+            orderValueDisplay.textContent = orderAmount;
+        });
+
+        startButton.addEventListener("click", initializeGame);
+        restartButton.addEventListener("click", initializeGame);
+    </script>
+</body>
+</html>
