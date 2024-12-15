@@ -114,7 +114,7 @@
             <div>Lieferkosten: <span id="deliveryCost" style="float: right;">0</span> €</div>
             <div>Lagerkosten: <span id="storageCost" style="float: right;">0</span> €</div>
             <div>Einnahmen pro Runde: <span id="income" style="float: right;">0</span> €</div>
-            <div id="timer">Zeit: <span id="timeLeft" style="float: right;">40</span> Sek</div>
+            <div id="timer">Zeit: <span id="timeLeft" style="float: right;">52</span> Sek</div>
             <button id="start-button" class="button">Start</button>
             <button id="restart-button" class="button" style="display: none;">Neu starten</button>
     
@@ -139,7 +139,7 @@
         const startButton = document.getElementById("start-button");
         const restartButton = document.getElementById("restart-button");
         
-        let balance, stock, orderAmount, timeLeft, gameInterval, timerInterval;
+        let balance, stock, orderAmount, timeLeft, gameInterval, timerInterval, consumption, orderCost, storageCost, income;
         const background = new Image();
         background.src = 'background.png';
         const packageImage = new Image();
@@ -152,14 +152,14 @@
             balance = 1000;
             stock = 50;
             orderAmount = 10;
-            timeLeft = 40;
+            timeLeft = 52;
             gameOverDisplay.style.display = "none";
             finalBalanceDisplay.style.display = "none";
             restartButton.style.display = "none";
             startButton.style.display = "none";
             updateDisplay();
             drawWarehouse();
-            gameInterval = setInterval(nextRound, 500);
+            gameInterval = setInterval(nextRound, 1000);
             startTimer();
         }
         
@@ -192,7 +192,7 @@
         }
         
         function nextRound() {
-            if (balance <= 0 || stock >= MAX_STOCK || stock <= MIN_STOCK) {
+            if (balance <= 0 || stock >= MAX_STOCK || stock <= MIN_STOCK || consumption > stock) {
                 gameOverDisplay.style.display = "block";
                 clearInterval(gameInterval);
                 clearInterval(timerInterval);
@@ -209,17 +209,23 @@
                 return;
             }
             
-            let consumption = Math.floor(Math.random() * 16) + 5;
-            let actualConsumption = Math.min(consumption, stock);
+            consumption = Math.floor(Math.random() * 16) + 5;
+            actualConsumption = Math.min(consumption, stock);
             stock -= actualConsumption;
-            let deliveryCost = orderAmount >= 30 ? orderAmount * 1 : orderAmount * 2;
-            let storageCost = stock * 1;
-            let income = actualConsumption * 5;
+            orderCost = 0;
+            deliveryCost = 0
+
+            if (stock < 34) {
+                deliveryCost = 10;
+                orderCost = orderAmount * 1;
+                stock += orderAmount;
+            }
+            storageCost = stock * 1;
+            income = actualConsumption * 5;
             
-            balance += income - deliveryCost - storageCost;
-            stock += orderAmount;
+            balance += income - orderCost - storageCost - deliveryCost;
             
-            deliveryCostDisplay.textContent = deliveryCost;
+            deliveryCostDisplay.textContent = orderCost;
             storageCostDisplay.textContent = storageCost;
             incomeDisplay.textContent = income;
             
