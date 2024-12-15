@@ -15,6 +15,10 @@
             margin: 0;
             padding: 0;
         }
+        .descriptin {
+            text-align: left;
+            margin: 20px;
+        }
         .container {
             margin: 20px auto;
             width: 90%;
@@ -31,7 +35,7 @@
         }
         .controls input[type="range"] {
             width: 300px;
-            accent-color: #00ffa2;
+            accent-color: #2BAC6A;
         }
         .stats {
             margin: auto;
@@ -62,7 +66,7 @@
         #times-up {
             display: none;
             font-size: 24px;
-            color: #00ffa2;
+            color: #2BAC6A;
             margin-top: 20px;
         }
         #timer {
@@ -72,25 +76,29 @@
         }
 
         .button {
+                        font-family: 'Press Start 2P', cursive;
+
             font-size: 18px;
             padding: 10px 20px;
             cursor: pointer;
-            background-color: #444;
-            color: #00ffa2;
-            border: 2px solid #00ffa2;
-            border-radius: 5px;
+            background-color: #2BAC6A;
+            color: #ffffff;
+            border: 2px solid #2BAC6A;
             text-transform: uppercase;
-            box-shadow: 0 0 10px #00ffa2;
+            box-shadow: 0 0 10px #2BAC6A;
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="descriptin">
         <h1>Zielkonflikt-Spiel</h1>
         <p>Dein Ziel ist es, in 40 Sekunden möglichst viel mit deinen Paketen zu verdienen. </p>
+            <p>Bestelle Pakete, um sie zu verkaufen.</p>
             <p>Beachte aber, dass die Nachfrage schwankt.</p>
             <p>Das Spiel ist vorbei, wenn du nicht liefern kannst, dein Lager voll ist oder du nicht liefern kannst.</p>
-        
+            <p><a href="help.html" style="color: #2BAC6A;">Erfahre mehr über den Zielkonflikt und Bestellmengen</a></p>
+        </div>
         <canvas id="warehouse" width="600" height="600"></canvas>
         <div id="game-over">Spiel vorbei!</div>
         <div id="times-up">Die Zeit ist abgelaufen. <br>Du hast <span id="final-balance"></span> € verdient.</div>
