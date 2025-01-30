@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <title>Logistik-Zielkonflikt-Spiel</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            text-align: center;
+            background-color: #f8f8f8;
+            color: #000000;
+            margin: 0;
+            padding: 0;
+        }
+        h1, .button, input[type="number"] {
+            font-family: 'Press Start 2P', cursive;
+        }
+        .description {
+            text-align: left;
+            padding-left: 50px;
+            padding-right: 50px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .stats {
+            margin: 10px;
+            border-radius: 10px;
+            max-width: 400px;
+            color: #fff;
+            padding: 20px;
+        }
+        .screen {
+            background: url('retro_computer.png') no-repeat center center;
+            background-size: contain;
+            max-width: 400px;
+            height: 400px;
+            margin: auto;
+            padding: 50px;
+            padding-bottom: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Press Start 2P', cursive;
+
+        }
+        .button {
+            font-size: 18px;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #2BAC6A;
+            color: #ffffff;
+            border: 2px solid #2BAC6A;
+            text-transform: uppercase;
+            box-shadow: 0 0 10px #2BAC6A;
+        }
+        .formula {
+            font-size: 16px;
+            color: #2BAC6A;
+            margin: 20px 0;
+        }
+        input[type="number"] {
+            font-size: 14px;
+            padding: 5px;
+            margin: 10px 0;
+            width: 90%;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            margin: 10px 0 5px;
+        }
+        .hidden {
+            display: none;
+        }
+        .math-formula {
+            font-size: 18px;
+            color: #2BAC6A;
+            font-family: 'Times New Roman', serif;
+            margin: 20px 0;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+    <div class="description" >
+        <h1 style="text-align: left; padding-left: 50px;">Zielkonflikt-Spiel</h1>
+        <div class="description" style="font-family: 'Press Start 2P'">
+            <table style= "width: 100%;">
+                <tr>
+                    <td>
+                        <form action="index.html">
+                            <input type="submit" value="Zurück zum Spiel" />
+                        </form>
+                    </td>
+                    <td style="text-align:center">
+                        Werte
+                    </td>
+                    <td style="text-align: end">
+                        <form action="bestellmenge.html">
+                            <input type="submit" value="Weiter zur Bestellmenge" />
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <p class="description">Dem Spiel liegen die folgenden Werte zugrunde</p>
+        <div class="description">
+
+            <table  style="border-collapse: collapse; width: 100%; height: 90px;" border="1">
+            <tbody>
+            <tr style="height: 18px;">
+            <td style="width: 74.947589%; height: 18px;">Meldebestand</td>
+            <td style="width: 25.052411%; height: 18px;">34 St&uuml;ck</td>
+            </tr>
+            <tr style="height: 18px;">
+            <td style="width: 74.947589%; height: 18px;">Verkaufspreis</td>
+            <td style="width: 25.052411%; height: 18px;">5 &euro;</td>
+            </tr>
+            <tr style="height: 18px;">
+            <td style="width: 74.947589%; height: 18px;">Einkaufspreis</td>
+            <td style="width: 25.052411%; height: 18px;">1 &euro;</td>
+            </tr>
+            <tr style="height: 18px;">
+            <td style="width: 74.947589%; height: 18px;">Lieferkosten pro Bestellung</td>
+            <td style="width: 25.052411%; height: 18px;">10 &euro;</td>
+            </tr>
+            <tr style="height: 18px;">
+            <td style="width: 74.947589%; height: 18px;">Lagerkosten pro St&uuml;ck pro Woche</td>
+            <td style="width: 25.052411%; height: 18px;">1 &euro;</td>
+            </tr>
+            </tbody>    
+
+            </table>   
+        </div> 
+        <p class="description"> Jede Sekunde im Spiel steht f&uuml;r eine Woche in deinem Gesch&auml;ftsjahr. Die Nachfrage schwankt, aber durschschnittlich kannst du 13 St&uuml;ck pro Woche verkaufen. Jetzt kannst du deine optimale Bestellmenge berechnen.</p>
+    </div>
+
+    <script>
+        function calculateEOQ() {
+            const demand = parseFloat(document.getElementById('demand').value);
+            const orderCost = parseFloat(document.getElementById('orderCost').value);
+            const holdingCost = parseFloat(document.getElementById('holdingCost').value);
+
+            document.getElementById('orderForm').classList.add('hidden');
+            document.getElementById('restartButton').classList.remove('hidden');
+
+            if (isNaN(demand) || isNaN(orderCost) || isNaN(holdingCost) || demand <= 0 || orderCost <= 0 || holdingCost <= 0) {
+                document.getElementById('result').innerText = "Bitte alle Felder korrekt ausfüllen.";
+                return;
+            }
+
+            const eoq = Math.sqrt((2 * demand * orderCost) / holdingCost);
+            document.getElementById('result').innerText = `Optimale Bestellmenge: ${eoq.toFixed(2)} Einheiten`;
+        }
+
+        function restartCalculator() {
+            document.getElementById('orderForm').reset();
+            document.getElementById('orderForm').classList.remove('hidden');
+            document.getElementById('result').innerText = "";
+            document.getElementById('restartButton').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
