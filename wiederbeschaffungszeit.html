@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <title>Logistik-Zielkonflikt-Spiel</title>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+    }
+    .chart {
+        position: relative;
+        width: 80%;
+        height: 400px;
+        margin: 20px auto;
+        border: 1px solid #ccc;
+    }
+    .line {
+        position: absolute;
+        width: 100%;
+        height: 2px;
+        background: #888;
+        display: none;
+    }
+    .marker {
+        position: absolute;
+        width: 2px;
+        height: 100%;
+        background: #2BAC6A;
+        display: none;
+    }
+    .decreasing-line {
+        position: absolute;
+        height: 2px;
+        background: #00f;
+        display: none;
+    }
+    .annotation {
+        font-size: 14px;
+        margin-top: 10px;
+    }
+    body {
+        font-family: 'Roboto', sans-serif;
+        text-align: center;
+        background-color: #f8f8f8;
+        color: #000000;
+        margin: 0;
+        padding: 0;
+    }
+    h1, .button, input[type="number"] {
+        font-family: 'Press Start 2P', cursive;
+    }
+    .description {
+        text-align: left;
+        padding-left: 50px;
+        padding-right: 50px;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+    .stats {
+        margin: 10px;
+        border-radius: 10px;
+        max-width: 400px;
+        color: #fff;
+        padding: 20px;
+    }
+    .screen {
+        background: url('retro_computer.png') no-repeat center center;
+        background-size: contain;
+        max-width: 400px;
+        height: 400px;
+        margin: auto;
+        padding: 50px;
+        padding-bottom: 120px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Press Start 2P', cursive;
+
+    }
+    .button {
+        font-size: 18px;
+        padding: 10px 20px;
+        cursor: pointer;
+        background-color: #2BAC6A;
+        color: #ffffff;
+        border: 2px solid #2BAC6A;
+        text-transform: uppercase;
+        box-shadow: 0 0 10px #2BAC6A;
+    }
+    .formula {
+        font-size: 16px;
+        color: #2BAC6A;
+        margin: 20px 0;
+    }
+    input[type="number"] {
+        font-size: 14px;
+        padding: 5px;
+        margin: 10px 0;
+        width: 90%;
+    }
+    label {
+        display: block;
+        font-family: 'Press Start 2P';
+        font-size: 14px;
+        margin: 10px 0 5px;
+    }
+    .hidden {
+        display: none;
+    }
+    .math-formula {
+        font-size: 18px;
+        color: #2BAC6A;
+        font-family: 'Times New Roman', serif;
+        margin: 20px 0;
+    }
+    .line {
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      background: #888;
+      display: none;
+    }
+    .chart {
+      position: relative;
+      width: 80%;
+      height: 400px;
+      margin: 20px auto;
+      border: 1px solid #ccc;
+    }
+    .curve {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+    .marker {
+      position: absolute;
+      width: 2px;
+      height: 100%;
+      background: #f00;
+      display: none;
+    }
+    .annotation {
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    path {
+      fill: none;
+      stroke: #007bff;
+      stroke-width: 2;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    .chart {
+      position: relative;
+      width: 80%;
+      height: 400px;
+      margin: 20px auto;
+      border: 1px solid #ccc;
+      background-color: #000000;
+    }
+    .line {
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      background: #2BAC6A;
+      display: none;
+    }
+    .label {
+      position: absolute;
+      color: #2BAC6A;
+      font-family: 'Press Start 2P';
+      padding: 2px 5px;
+      font-size: 12px;
+      display: none;
+    }
+    .curve {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+    .point {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: red;
+      border-radius: 50%;
+      display: none;
+      transform: translate(-50%, -50%);
+    }
+    .bracket {
+      position: absolute;
+      height: 2px;
+      background: #ff0000;
+      display: none;
+    }
+    .bracket-label {
+      position: absolute;
+      font-family: 'Press Start 2P';
+      font-size: 12px;
+      color: #ff0000;
+      display: none;
+    }
+    .marker {
+      position: absolute;
+      width: 2px;
+      height: 100%;
+      background: #2BAC6A;
+      display: none;
+    }
+    .annotation {
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    path {
+      fill: none;
+      stroke: #ffffff;
+      stroke-width: 2;
+    }
+  </style>
+</head>
+
+<body>
+    <div class="description" >
+        <h1 style="text-align: left; padding-left: 50px;">Zielkonflikt-Spiel</h1>
+        <div class="description" style="font-family: 'Press Start 2P'">
+            <table style= "width: 100%;">
+                <tr>
+                    <td>
+                        <form action="meldebestand.html">
+                            <input type="submit" value="Zurück zum Meldebestand" />
+                        </form>
+                    </td>
+                    <td style="text-align:center">
+                        Wiederbeschaffungszeit
+                    </td>
+                    <td style="text-align: end">
+                        <form action="index.html">
+                            <input type="submit" value="Zum Spiel" />
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <p class="description">Verwende den Schieberegler, um herauszufinden, wie die drei Größen "Meldebestand", "Sicherheitsbestand" und "Wiederbeschaffungszeit" zusammenspielen.</p>
+    </div>
+
+  <div class="chart" id="chart">
+    <svg class="curve" id="stockCurve">
+      <path d="" id="curvePath"></path>
+    </svg>
+    <div class="line" id="reorderLevel" style="top: 50%;"></div>
+    <div class="line" id="safetyStock" style="top: 80%;"></div>
+    <div class="label" id="stockLabel" style="top: 10%; left: 10%; color:white">Bestand</div>
+    <div class="label" id="reorderLabel" style="top: 45%; left: 10%;">Meldebestand</div>
+    <div class="label" id="safetyLabel" style="top: 75%; left: 10%;">Sicherheitsbestand</div>
+    <div class="label" id="wbzLabel" style="top: 90%; left: 70%;"></div>
+    <div class="point" id="orderPoint" style="top: 50%; left: 33.3%;"></div>
+    <div class="point" id="safetyPoint" style="top: 80%; left: 66.5%;"></div>
+    <div class="bracket" id="wbzBracket" style="top: 85%; left: 33.3%; width: 33.2%;"></div>
+    <div class="bracket-label" id="wbzBracketLabel" style="top: 88%; left: 35%;">Wiederbeschaffungszeit</div>
+    <div class="marker" id="timeMarker"></div>
+  </div>
+  <input type="range" id="timeSlider" min="0" max="6" step="1" value="0" style="width: 80%; margin-top: 20px;">
+  <div class="screen">
+    <div class="stats">  <div class="annotation" id="annotation">Das Lager ist voll.</div>
+</div>
+    </div>
+  <script>
+    const timeSlider = document.getElementById('timeSlider');
+    const annotation = document.getElementById('annotation');
+    const reorderLevel = document.getElementById('reorderLevel');
+    const safetyStock = document.getElementById('safetyStock');
+    const stockLabel = document.getElementById('stockLabel');
+    const reorderLabel = document.getElementById('reorderLabel');
+    const safetyLabel = document.getElementById('safetyLabel');
+    const wbzLabel = document.getElementById('wbzLabel');
+    const orderPoint = document.getElementById('orderPoint');
+    const safetyPoint = document.getElementById('safetyPoint');
+    const wbzBracket = document.getElementById('wbzBracket');
+    const wbzBracketLabel = document.getElementById('wbzBracketLabel');
+    const timeMarker = document.getElementById('timeMarker');
+    const curvePath = document.getElementById('curvePath');
+
+    const annotations = [
+      "Das Lager ist voll.",
+      "Dein Bestand nimmt ab.",
+      "Dein Meldebestand ist erreicht. Du bestellst die optimale Bestellmenge nach.",
+      "Dein Bestand nimmt weiter ab, aber Nachschub ist unterwegs.",
+      "Der Sicherheitsbestand ist fast erreicht.",
+      "Dein Sicherheitsbestand ist erreicht und der Nachschub trifft ein.",
+      "Es beginnt von vorn."
+    ];
+
+    const curvePoints = [
+      [0, 10],  // t0
+      [16.6, 30], // t1
+      [33.3, 50], // t2
+      [49.9, 70], // t3
+      [66.5, 80], // t4
+      [83.1, 10], // t5 (refilled)
+      [100, 30]
+    ];
+
+    function updateCurve(time) {
+      const chartWidth = document.getElementById('chart').clientWidth;
+      const chartHeight = document.getElementById('chart').clientHeight;
+
+      let path = "M";
+      for (let i = 0; i <= time; i++) {
+        const [x, y] = curvePoints[i];
+        path += `${(x / 100) * chartWidth} ${(y / 100) * chartHeight} `;
+        if (i < time) path += "L";
+      }
+      curvePath.setAttribute('d', path);
+    }
+
+    timeSlider.addEventListener('input', (event) => {
+      const time = parseInt(event.target.value);
+      annotation.textContent = annotations[time];
+
+      // Show labels step by step
+      if (time >= 0) {
+        stockLabel.style.display = 'block';
+      }
+      if (time >= 2) {
+        reorderLabel.style.display = 'block';
+        reorderLevel.style.display = 'block';
+        orderPoint.style.display = 'block';
+      }
+      if (time >= 4) {
+        safetyLabel.style.display = 'block';
+        safetyStock.style.display = 'block';
+        safetyPoint.style.display = 'block';
+      }
+      if (time >= 5) {
+        wbzBracket.style.display = 'block';
+        wbzBracketLabel.style.display = 'block';
+      }
+
+      // Update marker position
+      const chartWidth = document.getElementById('chart').clientWidth;
+      timeMarker.style.display = 'block';
+      timeMarker.style.left = `${(time / 6) * chartWidth}px`;
+
+      // Update curve
+      updateCurve(time);
+    });
+
+    updateCurve(0); // Initialize curve at t0
+  </script>
+</body>
+</html>
