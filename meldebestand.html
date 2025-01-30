@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <title>Logistik-Zielkonflikt-Spiel</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            text-align: center;
+            background-color: #f8f8f8;
+            color: #000000;
+            margin: 0;
+            padding: 0;
+        }
+        h1, .button, input[type="number"] {
+            font-family: 'Press Start 2P', cursive;
+        }
+        .description {
+            text-align: left;
+            padding-left: 50px;
+            padding-right: 50px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .stats {
+            margin: 10px;
+            border-radius: 10px;
+            max-width: 400px;
+            color: #fff;
+            padding: 20px;
+        }
+        .screen {
+            background: url('retro_computer.png') no-repeat center center;
+            background-size: contain;
+            max-width: 400px;
+            height: 400px;
+            margin: auto;
+            padding: 50px;
+            padding-bottom: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Press Start 2P', cursive;
+
+        }
+        .button {
+            font-size: 18px;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #2BAC6A;
+            color: #ffffff;
+            border: 2px solid #2BAC6A;
+            text-transform: uppercase;
+            box-shadow: 0 0 10px #2BAC6A;
+        }
+        .formula {
+            font-size: 16px;
+            color: #2BAC6A;
+            margin: 20px 0;
+        }
+        input[type="number"] {
+            font-size: 14px;
+            padding: 5px;
+            margin: 10px 0;
+            width: 90%;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            margin: 10px 0 5px;
+        }
+        .hidden {
+            display: none;
+        }
+        .math-formula {
+            font-size: 18px;
+            color: #2BAC6A;
+            font-family: 'Times New Roman', serif;
+            margin: 20px 0;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+    <div class="description" >
+        <h1 style="text-align: left; padding-left: 50px;">Zielkonflikt-Spiel</h1>
+        <div class="description" style="font-family: 'Press Start 2P'">
+            <table style= "width: 100%;">
+                <tr>
+                    <td>
+                        <form action="bestellmenge.html">
+                            <input type="submit" value="Zurück zur Bestellmenge" />
+                        </form>
+                    </td>
+                    <td style="text-align:center">
+                        Meldebestand
+                    </td>
+                    <td style="text-align: end">
+                        <form action="wiederbeschaffungszeit.html">
+                            <input type="submit" value="Weiter zur Wiederbeschaffunsgzeit" />
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <p class="description">Nicht nur die Bestellmenge ist eine relevante Größe. Auch der Meldebestand kann durch eine Formel optimiert werden:</p>
+        <p class="math-formula">\[ \text{Tagesbedarf} \times \text{Lieferzeit in Tagen} + \text{Sicherheitsbestand}\]</p>
+        <p class="description">Im Spiel ist der Meldebestand auf 34 Stück festgelegt. Hier kannst du aber für deine eigenen Werte den Meldebestand berechnen.</p>
+    </div>
+    <h2 style="font-family: 'Press Start 2P', cursive; margin-top: 20px;">Meldebestandsrechner</h2>
+
+    <div class="screen">
+        <div class="stats">
+            <form id="orderForm">
+                <label for="demand">Tagesbedarf:</label>
+                <input type="number" id="consumation" placeholder="z.B. 50" required>
+
+                <label for="orderCost">Lieferzeit (Tage):</label>
+                <input type="number" id="delivery" placeholder="z.B. 10" required>
+
+                <label for="holdingCost">Sicherheitsbestand:</label>
+                <input type="number" id="buffer" placeholder="z.B. 200" required>
+
+                <button type="button" class="button" onclick="calculateEOQ()">Berechnen</button>
+            </form>
+            <p id="result" class="formula"></p>
+            <button id="restartButton" class="button hidden" onclick="restartCalculator()">Neustart</button>
+        </div>
+    </div>
+
+    <script>
+        function calculateEOQ() {
+            const consumation = parseFloat(document.getElementById('consumation').value);
+            const delivery = parseFloat(document.getElementById('delivery').value);
+            const buffer = parseFloat(document.getElementById('buffer').value);
+
+            document.getElementById('orderForm').classList.add('hidden');
+            document.getElementById('restartButton').classList.remove('hidden');
+
+            if (isNaN(consumation) || isNaN(delivery) || isNaN(buffer) || consumation <= 0 || delivery <= 0 || buffer <= 0) {
+                document.getElementById('result').innerText = "Bitte alle Felder korrekt ausfüllen.";
+                return;
+            }
+
+            const eoq = consumation * delivery + buffer;
+            document.getElementById('result').innerText = `Optimaler Meldebestand: ${eoq.toFixed(2)} Einheiten`;
+        }
+
+        function restartCalculator() {
+            document.getElementById('orderForm').reset();
+            document.getElementById('orderForm').classList.remove('hidden');
+            document.getElementById('result').innerText = "";
+            document.getElementById('restartButton').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
